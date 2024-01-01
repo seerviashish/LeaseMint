@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -12,7 +14,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -22,7 +24,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -45,6 +47,47 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    flavorDimensions += "environment"
+
+    productFlavors {
+        val appProperties = Properties()
+        val environment = "environment"
+        appProperties.load(File(rootDir, "app.properties").bufferedReader())
+        create("dev") {
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            dimension = environment
+            manifestPlaceholders+= "appName" to appProperties.getProperty("dev.appName")
+            resValue("string", "app_name", appProperties.getProperty("dev.appName"))
+        }
+        create("qa") {
+            applicationIdSuffix = ".qa"
+            versionNameSuffix = "-qa"
+            dimension = environment
+            manifestPlaceholders+= "appName" to appProperties.getProperty("qa.appName")
+            resValue("string", "app_name", appProperties.getProperty("qa.appName"))
+        }
+        create("stage") {
+            applicationIdSuffix = ".stage"
+            versionNameSuffix = "-stage"
+            dimension = environment
+            manifestPlaceholders+= "appName" to appProperties.getProperty("stage.appName")
+            resValue("string", "app_name", appProperties.getProperty("stage.appName"))
+        }
+        create("uat") {
+            applicationIdSuffix = ".uat"
+            versionNameSuffix = "-uat"
+            dimension = environment
+            manifestPlaceholders+= "appName" to appProperties.getProperty("uat.appName")
+            resValue("string", "app_name", appProperties.getProperty("uat.appName"))
+        }
+        create("prod") {
+            dimension = environment
+            manifestPlaceholders+= "appName" to appProperties.getProperty("prod.appName")
+            resValue("string", "app_name", appProperties.getProperty("prod.appName"))
         }
     }
 }
